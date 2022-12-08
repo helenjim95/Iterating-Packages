@@ -5,7 +5,7 @@ package de.tum.in.ase;
 import java.util.*;
 
 // TODO: implement interface
-public class Delivery<E> implements Iterable<E> {
+public class Delivery<T, E> implements Iterable<E> {
 
 	private final String address;
 	private Map<String, Set<Package>> packagesByAddress;
@@ -55,7 +55,7 @@ public class Delivery<E> implements Iterable<E> {
 			private int countOfRemoves = 0;
 			private int countOfNext = 0;
 			private E[] keyArray = (E[]) packagesByAddress.keySet().toArray();
-			private Set<E> packageByIndex = (Set<E>) packagesByAddress.get(keyArray[index]);
+			private E packageByIndex = (E) packagesByAddress.get(keyArray[index]);
 
 			//			TODO: need to fix it
 //			For any address, it returns all packages destinated to this address, sorted by their weight.
@@ -64,7 +64,7 @@ public class Delivery<E> implements Iterable<E> {
 //			Throw a NoSuchElementException if next() gets called even though there are no packages to return.
 			@Override
 			public E next() throws NoSuchElementException {
-				Set<E> temp;
+				E temp;
 				Object key = packagesByAddress.keySet().toArray()[index];
 
 				if (!hasNext()) {
@@ -72,9 +72,9 @@ public class Delivery<E> implements Iterable<E> {
 				} else {
 //					Sort by address, the set of packages sort by weight (heaviest first)
 //					Map<T, Set<E>> sortedMap = Stream.of(packagesByAddress).collect(Comparator.comparing(Map::getKey)).collect(Comparator.comparing(Package::getWeight));
-					temp = (Set<E>) keyArray[index];
+					temp = (E) keyArray[index];
 					index++;
-					return (E) temp;
+					return temp;
 				}
 			}
 
@@ -109,6 +109,11 @@ public class Delivery<E> implements Iterable<E> {
 		delivery.add(new Package("Penguinway 6", "Tierpark Hellabrunn, Tierparkstr. 30", 1));
 		delivery.add(new Package("Tierpark Hellabrunn, Tierparkstr. 30", "Penguinway 6", 0.3));
 		delivery.add(new Package("Antarcticplace 123", "Penguroad 1", 6));
+		Iterator iterator = delivery.iterator();
+//		System.out.println(iterator.hasNext());
+//		System.out.println(iterator.next());
+		iterator.remove();
+		System.out.println(delivery.packagesByAddress);
 	}
 
 
