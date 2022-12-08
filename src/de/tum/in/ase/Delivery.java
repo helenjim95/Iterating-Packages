@@ -4,8 +4,7 @@ package de.tum.in.ase;
 
 import java.util.*;
 
-// TODO: implement interface
-public class Delivery<Package> implements Iterable<Package> {
+public class Delivery<E> implements Iterable<E> {
 
 	private final String address;
 	private Map<String, Set<Package>> packagesByAddress;
@@ -30,7 +29,7 @@ public class Delivery<Package> implements Iterable<Package> {
 			this.packagesByAddress.put(aPackage.getAddress(), Set.of(aPackage));
 		} else {
 			if (this.packagesByAddress.containsKey(aPackage.getAddress())) {
-				Set<Package> newSet = new HashSet<Package>();
+				Set<Package> newSet = new HashSet<>();
 				newSet.addAll(this.packagesByAddress.get(aPackage.getAddress()));
 				newSet.add(aPackage);
 				this.packagesByAddress.put(aPackage.getAddress(), newSet);
@@ -49,13 +48,13 @@ public class Delivery<Package> implements Iterable<Package> {
 
 	// TODO: implement iterator
 	@Override
-	public Iterator<Package> iterator() {
-		return new Iterator<Package>() {
+	public Iterator<E> iterator() {
+		return new Iterator<E>() {
 			private int index = 0;
 			private int countOfRemoves = 0;
 			private int countOfNext = 0;
-			private String[] keyArray = (String[]) packagesByAddress.keySet().toArray();
-			private Set<Package> packageByIndex = packagesByAddress.get(keyArray[index]);
+			private List keyList = List.of(packagesByAddress.keySet());
+			private Set<Package> packageByIndex = packagesByAddress.get(keyList.get(index));
 
 			//			TODO: need to fix it
 //			For any address, it returns all packages destinated to this address, sorted by their weight.
@@ -63,16 +62,16 @@ public class Delivery<Package> implements Iterable<Package> {
 //			The heaviest package should be returned first.
 //			Throw a NoSuchElementException if next() gets called even though there are no packages to return.
 			@Override
-			public Set<Package> next() throws NoSuchElementException {
-				Set<Package> temp;
+			public E next() throws NoSuchElementException {
+				E temp;
 //				Object key = packagesByAddress.keySet().toArray()[index];
 
 				if (!hasNext()) {
 					throw new NoSuchElementException();
 				} else {
-//					Sort by address, the set of packages sort by weight (heaviest first)
+//					Sort by address, the set of packages sort by weight (the heaviest first)
 //					Map<String, Set<E>> sortedMap = Stream.of(packagesByAddress).collect(Comparator.comparing(Map::getKey)).collect(Comparator.comparing(Package::getWeight));
-					temp = (Set<E>) keyArray[index];
+					temp = (E) keyList.get(index);
 					index++;
 					return temp;
 				}
@@ -80,7 +79,7 @@ public class Delivery<Package> implements Iterable<Package> {
 
 			@Override
 			public boolean hasNext() {
-				return index < keyArray.length;
+				return index < keyList.size();
 			}
 
 			//	TODO this optional challenge:
