@@ -71,8 +71,8 @@ public class Delivery<T extends String, E extends Set<Package>> implements Itera
 				} else {
 //					Sort by address, the set of packages sort by weight (the heaviest first)
 //					Map<String, Set<E>> sortedMap = Stream.of(packagesByAddress).collect(Comparator.comparing(Map::getKey)).collect(Comparator.comparing(Package::getWeight));
-					index++;
 					temp = (E) packagesByAddress.get(keyList.get(index));
+					index++;
 					return temp;
 				}
 			}
