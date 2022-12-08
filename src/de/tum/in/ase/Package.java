@@ -56,6 +56,7 @@ public class Package implements Comparable<Package> {
 	}
 
 //	heavier packages should be placed first in the result
+	@Override
 	public int compareTo(Package other) {
 		return Double.compare(other.weight, weight);
 	}
