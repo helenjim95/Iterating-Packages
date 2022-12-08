@@ -4,7 +4,7 @@ package de.tum.in.ase;
 
 import java.util.*;
 
-public class Delivery<E extends Package> implements Iterable<E> {
+public class Delivery<T extends String, E extends Set<Package>> implements Iterable<E> {
 
 	private final String address;
 	private Map<String, Set<Package>> packagesByAddress;
@@ -53,8 +53,7 @@ public class Delivery<E extends Package> implements Iterable<E> {
 			private int countOfRemoves = 0;
 			private int countOfNext = 0;
 			private Delivery delivery;
-			private List keyList = List.of(packagesByAddress.keySet());
-			private Set<Package> packageByIndex = packagesByAddress.get(keyList.get(index));
+			private List<Set<String>> keyList = List.of(packagesByAddress.keySet());
 
 			//			TODO: need to fix it
 //			For any address, it returns all packages destinated to this address, sorted by their weight.
@@ -72,8 +71,8 @@ public class Delivery<E extends Package> implements Iterable<E> {
 				} else {
 //					Sort by address, the set of packages sort by weight (the heaviest first)
 //					Map<String, Set<E>> sortedMap = Stream.of(packagesByAddress).collect(Comparator.comparing(Map::getKey)).collect(Comparator.comparing(Package::getWeight));
-					temp = (E) keyList.get(index);
 					index++;
+					temp = (E) packagesByAddress.get(keyList.get(index));
 					return temp;
 				}
 			}
@@ -90,15 +89,19 @@ public class Delivery<E extends Package> implements Iterable<E> {
 					throw new NoSuchElementException();
 				} else {
 //					A call to remove() starts the return process for the last package returned by getNext().
-					E package_ = this.next();
-					String temp_sender = package_.getSender();
-					String temp_address = package_.getAddress();
-//					Swap the values of sender and address to indicate the return.
-					package_.setSender(temp_address);
-					package_.setAddress(temp_sender);
-					packagesByAddress.get(temp_address).remove(package_);
-//					add this package to the suitable stack according to its new destination.
-					delivery.add(package_);
+					while(this.hasNext()) {
+						E package_set = this.next();
+						for (Package package_ : package_set) {
+							String temp_sender = package_.getSender();
+							String temp_address = package_.getAddress();
+							//					Swap the values of sender and address to indicate the return.
+							package_.setSender(temp_address);
+							package_.setAddress(temp_sender);
+							packagesByAddress.get(temp_address).remove(package_);
+		//					add this package to the suitable stack according to its new destination.
+							delivery.add(package_);
+						}
+					}
 				}
 			}
 		};
