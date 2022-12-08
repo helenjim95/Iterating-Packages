@@ -1,12 +1,14 @@
 package de.tum.in.ase;
 
+//import org.checkerframework.checker.nullness.qual.*;
+
 import java.util.*;
 
 // TODO: implement interface
-public class Delivery {
+public class Delivery<E> implements Iterable<E> {
 
 	private final String address;
-	private final Map<String, Set<Package>> packagesByAddress;
+	private Map<String, Set<Package>> packagesByAddress;
 
 	public Delivery(String address, Map<String, Set<Package>> packages) {
 		this.address = address;
@@ -24,7 +26,19 @@ public class Delivery {
 	}
 
 	public void add(Package aPackage) {
-		// TODO implement method
+		if (this.packagesByAddress.isEmpty()) {
+			this.packagesByAddress.put(aPackage.getAddress(), Set.of(aPackage));
+		} else {
+			if (this.packagesByAddress.containsKey(aPackage.getAddress())) {
+				Set<Package> newSet = new HashSet<Package>();
+				newSet.addAll(this.packagesByAddress.get(aPackage.getAddress()));
+				newSet.add(aPackage);
+				this.packagesByAddress.put(aPackage.getAddress(), newSet);
+			} else {
+				this.packagesByAddress.put(aPackage.getAddress(), Set.of(aPackage));
+			}
+		}
+//		System.out.println(this.packagesByAddress);
 	}
 
 	@Override
@@ -32,8 +46,57 @@ public class Delivery {
 		return "Delivery:\n  Address: " + address;
 	}
 
-	// TODO: implement iterator
 
+	// TODO: implement iterator
+	@Override
+	public Iterator<E> iterator() {
+		return new Iterator<E>() {
+			private int index = 0;
+			private int countOfRemoves = 0;
+			private int countOfNext = 0;
+			private E[] keyArray = (E[]) packagesByAddress.keySet().toArray();
+			private Set<E> packageByIndex = (Set<E>) packagesByAddress.get(keyArray[index]);
+
+			//			TODO: need to fix it
+//			For any address, it returns all packages destinated to this address, sorted by their weight.
+//			The addresses are sorted in lexiographic order.
+//			The heaviest package should be returned first.
+//			Throw a NoSuchElementException if next() gets called even though there are no packages to return.
+			@Override
+			public E next() throws NoSuchElementException {
+				Set<E> temp;
+				Object key = packagesByAddress.keySet().toArray()[index];
+
+				if (!hasNext()) {
+					throw new NoSuchElementException();
+				} else {
+//					Sort by address, the set of packages sort by weight (heaviest first)
+//					Map<T, Set<E>> sortedMap = Stream.of(packagesByAddress).collect(Comparator.comparing(Map::getKey)).collect(Comparator.comparing(Package::getWeight));
+					temp = (Set<E>) keyArray[index];
+					index++;
+					return (E) temp;
+				}
+			}
+
+			@Override
+			public boolean hasNext() {
+				return index < keyArray.length;
+			}
+
+			//	TODO this optional challenge:
+			//	A call to remove() starts the return process for the last package returned by getNext().
+			//	Throw a NoSuchElementException in case next() was not called previously or
+			//	if remove() gets called twice in a row.
+			public void remove() throws NoSuchElementException {
+				countOfRemoves++;
+				if (countOfNext < 1 || countOfRemoves > 1) {
+					throw new NoSuchElementException();
+				} else {
+					packagesByAddress.remove(this.next());
+				}
+			}
+		};
+	}
 
 	public static void main(String[] args) {
 		// TODO test your code:
@@ -47,4 +110,6 @@ public class Delivery {
 		delivery.add(new Package("Tierpark Hellabrunn, Tierparkstr. 30", "Penguinway 6", 0.3));
 		delivery.add(new Package("Antarcticplace 123", "Penguroad 1", 6));
 	}
+
+
 }

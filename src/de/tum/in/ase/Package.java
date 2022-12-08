@@ -2,7 +2,7 @@ package de.tum.in.ase;
 
 import java.util.Objects;
 
-public class Package {
+public class Package<T extends Comparable<T>> {
 	private String sender;
 	private String address;
 	private double weight;
@@ -53,6 +53,11 @@ public class Package {
 		return Double.compare(weight, otherPackage.weight) == 0
 		       && Objects.equals(address, otherPackage.address)
 		       && Objects.equals(sender, otherPackage.sender);
+	}
+
+//	heavier packages should be placed first in the result
+	public int compareTo(Package other) {
+		return Double.compare(other.weight, weight);
 	}
 
 	@Override
