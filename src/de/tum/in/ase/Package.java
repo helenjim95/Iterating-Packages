@@ -2,7 +2,7 @@ package de.tum.in.ase;
 
 import java.util.Objects;
 
-public class Package<T extends Comparable<T>> {
+public class Package implements Comparable<Package> {
 	private String sender;
 	private String address;
 	private double weight;

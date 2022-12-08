@@ -5,7 +5,7 @@ package de.tum.in.ase;
 import java.util.*;
 
 // TODO: implement interface
-public class Delivery<T, E> implements Iterable<E> {
+public class Delivery<Package> implements Iterable<Package> {
 
 	private final String address;
 	private Map<String, Set<Package>> packagesByAddress;
@@ -49,13 +49,13 @@ public class Delivery<T, E> implements Iterable<E> {
 
 	// TODO: implement iterator
 	@Override
-	public Iterator<E> iterator() {
-		return new Iterator<E>() {
+	public Iterator<Package> iterator() {
+		return new Iterator<Package>() {
 			private int index = 0;
 			private int countOfRemoves = 0;
 			private int countOfNext = 0;
-			private E[] keyArray = (E[]) packagesByAddress.keySet().toArray();
-			private E packageByIndex = (E) packagesByAddress.get(keyArray[index]);
+			private String[] keyArray = (String[]) packagesByAddress.keySet().toArray();
+			private Set<Package> packageByIndex = packagesByAddress.get(keyArray[index]);
 
 			//			TODO: need to fix it
 //			For any address, it returns all packages destinated to this address, sorted by their weight.
@@ -63,16 +63,16 @@ public class Delivery<T, E> implements Iterable<E> {
 //			The heaviest package should be returned first.
 //			Throw a NoSuchElementException if next() gets called even though there are no packages to return.
 			@Override
-			public E next() throws NoSuchElementException {
-				E temp;
-				Object key = packagesByAddress.keySet().toArray()[index];
+			public Set<Package> next() throws NoSuchElementException {
+				Set<Package> temp;
+//				Object key = packagesByAddress.keySet().toArray()[index];
 
 				if (!hasNext()) {
 					throw new NoSuchElementException();
 				} else {
 //					Sort by address, the set of packages sort by weight (heaviest first)
-//					Map<T, Set<E>> sortedMap = Stream.of(packagesByAddress).collect(Comparator.comparing(Map::getKey)).collect(Comparator.comparing(Package::getWeight));
-					temp = (E) keyArray[index];
+//					Map<String, Set<E>> sortedMap = Stream.of(packagesByAddress).collect(Comparator.comparing(Map::getKey)).collect(Comparator.comparing(Package::getWeight));
+					temp = (Set<E>) keyArray[index];
 					index++;
 					return temp;
 				}
