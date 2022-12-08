@@ -4,7 +4,7 @@ package de.tum.in.ase;
 
 import java.util.*;
 
-public class Delivery<E extends Iterable<E>> implements Iterable<E> {
+public class Delivery<E extends Package> implements Iterable<E> {
 
 	private final String address;
 	private Map<String, Set<Package>> packagesByAddress;
@@ -45,7 +45,6 @@ public class Delivery<E extends Iterable<E>> implements Iterable<E> {
 		return "Delivery:\n  Address: " + address;
 	}
 
-
 	// TODO: implement iterator
 	@Override
 	public Iterator<E> iterator() {
@@ -53,6 +52,7 @@ public class Delivery<E extends Iterable<E>> implements Iterable<E> {
 			private int index = 0;
 			private int countOfRemoves = 0;
 			private int countOfNext = 0;
+			private Delivery delivery;
 			private List keyList = List.of(packagesByAddress.keySet());
 			private Set<Package> packageByIndex = packagesByAddress.get(keyList.get(index));
 
@@ -83,16 +83,22 @@ public class Delivery<E extends Iterable<E>> implements Iterable<E> {
 				return index < keyList.size();
 			}
 
-			//	TODO this optional challenge:
-			//	A call to remove() starts the return process for the last package returned by getNext().
-			//	Throw a NoSuchElementException in case next() was not called previously or
-			//	if remove() gets called twice in a row.
 			public void remove() throws NoSuchElementException {
 				this.countOfRemoves++;
+//				Throw a NoSuchElementException in case next() was not called previously or if remove() gets called twice in a row.
 				if (this.countOfNext < 1 || this.countOfRemoves > 1) {
 					throw new NoSuchElementException();
 				} else {
-					packagesByAddress.remove(this.next());
+//					A call to remove() starts the return process for the last package returned by getNext().
+					E package_ = this.next();
+					String temp_sender = package_.getSender();
+					String temp_address = package_.getAddress();
+//					Swap the values of sender and address to indicate the return.
+					package_.setSender(temp_address);
+					package_.setAddress(temp_sender);
+					packagesByAddress.get(temp_address).remove(package_);
+//					add this package to the suitable stack according to its new destination.
+					delivery.add(package_);
 				}
 			}
 		};
