@@ -4,7 +4,7 @@ package de.tum.in.ase;
 
 import java.util.*;
 
-public class Delivery<E extends Iterable<E>> {
+public class Delivery<E extends Iterable<E>> implements Iterable<E> {
 
 	private final String address;
 	private Map<String, Set<Package>> packagesByAddress;
@@ -47,6 +47,7 @@ public class Delivery<E extends Iterable<E>> {
 
 
 	// TODO: implement iterator
+	@Override
 	public Iterator<E> iterator() {
 		return new Iterator<E>() {
 			private int index = 0;
