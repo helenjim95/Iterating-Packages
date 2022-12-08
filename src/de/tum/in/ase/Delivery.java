@@ -63,6 +63,7 @@ public class Delivery<E> implements Iterable<E> {
 //			Throw a NoSuchElementException if next() gets called even though there are no packages to return.
 			@Override
 			public E next() throws NoSuchElementException {
+				this.countOfNext++;
 				E temp;
 //				Object key = packagesByAddress.keySet().toArray()[index];
 
@@ -87,8 +88,8 @@ public class Delivery<E> implements Iterable<E> {
 			//	Throw a NoSuchElementException in case next() was not called previously or
 			//	if remove() gets called twice in a row.
 			public void remove() throws NoSuchElementException {
-				countOfRemoves++;
-				if (countOfNext < 1 || countOfRemoves > 1) {
+				this.countOfRemoves++;
+				if (this.countOfNext < 1 || this.countOfRemoves > 1) {
 					throw new NoSuchElementException();
 				} else {
 					packagesByAddress.remove(this.next());
