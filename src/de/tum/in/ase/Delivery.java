@@ -3,7 +3,7 @@ package de.tum.in.ase;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Delivery implements Iterable<Set<Package>> {
+public class Delivery implements Iterable<Package> {
 
 	private final String address;
 	private Map<String, Set<Package>> packagesByAddress;
@@ -17,7 +17,6 @@ public class Delivery implements Iterable<Set<Package>> {
 		this.address = address;
 		this.packagesByAddress = new HashMap<>();
 	}
-
 
 	public String getAddress() {
 		return address;
@@ -50,7 +49,7 @@ public class Delivery implements Iterable<Set<Package>> {
 
 	// TODO: implement iterator
 	@Override
-	public Iterator<Set<Package>> iterator() {
+	public Iterator<Package> iterator() {
 		return new Iterator<>() {
 			private int index = 0;
 			private int countOfRemoves = 0;
@@ -61,22 +60,24 @@ public class Delivery implements Iterable<Set<Package>> {
 //			The heaviest package should be returned first.
 //			Throw a NoSuchElementException if next() gets called even though there are no packages to return.
 			@Override
-			public Set<Package> next() throws NoSuchElementException {
+			public Package next() throws NoSuchElementException {
 				index++;
 				if (!hasNext()) {
 					throw new NoSuchElementException();
 				} else {
 //					Sort by address, the set of packages sort by weight (the heaviest first)
-					Map<String, Set<Package>> sortedMap = getPackagesByAddress().entrySet()
+					Map<String, Set<Package>> sortedMapByWeight = getPackagesByAddress().entrySet()
 							.stream()
 							.sorted(Map.Entry.comparingByKey())
-							.sorted((Comparator<? super Map.Entry<String, Set<Package>>>) Map.Entry.comparingByValue().reversed())
-							.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+							.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
+							.sorted(Comparator.comparing(Package::getWeight).reversed())
+							.collect(Collectors.toSet()),
 								(oldValue, newValue) -> oldValue, LinkedHashMap::new));
 					int count = 1;
-					for (Map.Entry<String, Set<Package>> entry : sortedMap.entrySet()) {
+					for (Map.Entry<String, Set<Package>> entry :sortedMapByWeight.entrySet()) {
 						if (count == index) {
-							return entry.getValue();
+							Set<Package> packageSet = entry.getValue();
+							return packageSet.toArray(new Package[0])[0];
 						}
 						count++;
 					}
@@ -97,7 +98,7 @@ public class Delivery implements Iterable<Set<Package>> {
 				} else {
 //					A call to remove() starts the return process for the last package returned by getNext().
 					while(this.hasNext()) {
-						Set<Package> package_set = this.next();
+						Set<Package> package_set = (Set<Package>) this.next();
 						for (Package package_ : package_set) {
 							String temp_sender = package_.getSender();
 							String temp_address = package_.getAddress();
