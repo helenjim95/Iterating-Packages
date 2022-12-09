@@ -93,7 +93,7 @@ public class Delivery implements Iterable<Package> {
 			public void remove() throws NoSuchElementException {
 				this.countOfRemoves++;
 //				Throw a NoSuchElementException in case next() was not called previously or if remove() gets called twice in a row.
-				if (this.index < 1 || this.countOfRemoves > 1) {
+				if (this.index < 0 || this.countOfRemoves > 1) {
 					throw new NoSuchElementException();
 				} else {
 //					A call to remove() starts the return process for the last package returned by getNext().
@@ -104,7 +104,7 @@ public class Delivery implements Iterable<Package> {
 						//					Swap the values of sender and address to indicate the return.
 						package_.setSender(temp_address);
 						package_.setAddress(temp_sender);
-						packagesByAddress.get(temp_address).remove(package_);
+//						getPackagesByAddress().get(temp_address).remove(package_);
 	//					add this package to the suitable stack according to its new destination.
 						if (getPackagesByAddress().isEmpty()) {
 							getPackagesByAddress().put(package_.getAddress(), Set.of(package_));
