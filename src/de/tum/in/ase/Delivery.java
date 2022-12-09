@@ -47,14 +47,12 @@ public class Delivery implements Iterable<Package> {
 		return "Delivery:\n  Address: " + address;
 	}
 
-	// TODO: implement iterator
 	@Override
 	public Iterator<Package> iterator() {
 		return new Iterator<>() {
 			private int index = 0;
 			private int countOfRemoves = 0;
 
-			//			TODO: need to fix it
 //			For any address, it returns all packages destinated to this address, sorted by their weight.
 //			The addresses are sorted in lexiographic order.
 //			The heaviest package should be returned first.
@@ -114,8 +112,12 @@ public class Delivery implements Iterable<Package> {
 								newSet.addAll(getPackagesByAddress().get(package_.getAddress()));
 								newSet.add(package_);
 								getPackagesByAddress().put(package_.getAddress(), newSet);
-							} else {
-								getPackagesByAddress().put(package_.getAddress(), Set.of(package_));
+							}
+							if (getPackagesByAddress().containsKey(package_.getSender())) {
+								Set<Package> newSet = new HashSet<>();
+								newSet.addAll(getPackagesByAddress().get(package_.getSender()));
+								newSet.add(package_);
+								getPackagesByAddress().put(package_.getAddress(), newSet);
 							}
 						}
 					}
