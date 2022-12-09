@@ -61,7 +61,6 @@ public class Delivery implements Iterable<Package> {
 //			Throw a NoSuchElementException if next() gets called even though there are no packages to return.
 			@Override
 			public Package next() throws NoSuchElementException {
-				index++;
 				if (!hasNext()) {
 					throw new NoSuchElementException();
 				} else {
