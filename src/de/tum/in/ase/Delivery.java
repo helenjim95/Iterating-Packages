@@ -1,8 +1,7 @@
 package de.tum.in.ase;
 
-//import org.checkerframework.checker.nullness.qual.*;
-
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Delivery implements Iterable<Set<Package>> {
 
@@ -22,6 +21,10 @@ public class Delivery implements Iterable<Set<Package>> {
 
 	public String getAddress() {
 		return address;
+	}
+
+	public Map<String, Set<Package>> getPackagesByAddress() {
+		return packagesByAddress;
 	}
 
 	public void add(Package aPackage) {
@@ -48,12 +51,9 @@ public class Delivery implements Iterable<Set<Package>> {
 	// TODO: implement iterator
 	@Override
 	public Iterator<Set<Package>> iterator() {
-		return new Iterator<Set<Package>>() {
+		return new Iterator<>() {
 			private int index = 0;
 			private int countOfRemoves = 0;
-			private int countOfNext = 0;
-			private Delivery delivery;
-			private List<Set<String>> keyList = List.of(packagesByAddress.keySet());
 
 			//			TODO: need to fix it
 //			For any address, it returns all packages destinated to this address, sorted by their weight.
@@ -62,30 +62,37 @@ public class Delivery implements Iterable<Set<Package>> {
 //			Throw a NoSuchElementException if next() gets called even though there are no packages to return.
 			@Override
 			public Set<Package> next() throws NoSuchElementException {
-				this.countOfNext++;
-				Set<Package>  temp;
-//				Object key = packagesByAddress.keySet().toArray()[index];
-
+				index++;
 				if (!hasNext()) {
 					throw new NoSuchElementException();
 				} else {
 //					Sort by address, the set of packages sort by weight (the heaviest first)
-//					Map<String, Set<E>> sortedMap = Stream.of(packagesByAddress).collect(Comparator.comparing(Map::getKey)).collect(Comparator.comparing(Package::getWeight));
-					temp = (Set<Package>) packagesByAddress.get(keyList.get(index));
-					index++;
-					return temp;
+					Map<String, Set<Package>> sortedMap = getPackagesByAddress().entrySet()
+							.stream()
+							.sorted(Map.Entry.comparingByKey())
+							.sorted((Comparator<? super Map.Entry<String, Set<Package>>>) Map.Entry.comparingByValue().reversed())
+							.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+								(oldValue, newValue) -> oldValue, LinkedHashMap::new));
+					int count = 1;
+					for (Map.Entry<String, Set<Package>> entry : sortedMap.entrySet()) {
+						if (count == index) {
+							return entry.getValue();
+						}
+						count++;
+					}
 				}
+				return null;
 			}
 
 			@Override
 			public boolean hasNext() {
-				return index < keyList.size();
+				return index < getPackagesByAddress().size();
 			}
 
 			public void remove() throws NoSuchElementException {
 				this.countOfRemoves++;
 //				Throw a NoSuchElementException in case next() was not called previously or if remove() gets called twice in a row.
-				if (this.countOfNext < 1 || this.countOfRemoves > 1) {
+				if (this.index < 1 || this.countOfRemoves > 1) {
 					throw new NoSuchElementException();
 				} else {
 //					A call to remove() starts the return process for the last package returned by getNext().
@@ -99,7 +106,18 @@ public class Delivery implements Iterable<Set<Package>> {
 							package_.setAddress(temp_sender);
 							packagesByAddress.get(temp_address).remove(package_);
 		//					add this package to the suitable stack according to its new destination.
-							delivery.add(package_);
+							if (getPackagesByAddress().isEmpty()) {
+								getPackagesByAddress().put(package_.getAddress(), Set.of(package_));
+							} else {
+								if (getPackagesByAddress().containsKey(package_.getAddress())) {
+									Set<Package> newSet = new HashSet<>();
+									newSet.addAll(getPackagesByAddress().get(package_.getAddress()));
+									newSet.add(package_);
+									getPackagesByAddress().put(package_.getAddress(), newSet);
+								} else {
+									getPackagesByAddress().put(package_.getAddress(), Set.of(package_));
+								}
+							}
 						}
 					}
 				}
@@ -124,6 +142,4 @@ public class Delivery implements Iterable<Set<Package>> {
 		iterator.remove();
 		System.out.println(delivery.packagesByAddress);
 	}
-
-
 }
