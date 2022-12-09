@@ -4,7 +4,7 @@ package de.tum.in.ase;
 
 import java.util.*;
 
-public class Delivery<T extends String, E extends Set<Package>> implements Iterable<E> {
+public class Delivery implements Iterable<Set<Package>> {
 
 	private final String address;
 	private Map<String, Set<Package>> packagesByAddress;
@@ -47,8 +47,8 @@ public class Delivery<T extends String, E extends Set<Package>> implements Itera
 
 	// TODO: implement iterator
 	@Override
-	public Iterator<E> iterator() {
-		return new Iterator<E>() {
+	public Iterator<Set<Package>> iterator() {
+		return new Iterator<Set<Package>>() {
 			private int index = 0;
 			private int countOfRemoves = 0;
 			private int countOfNext = 0;
@@ -61,9 +61,9 @@ public class Delivery<T extends String, E extends Set<Package>> implements Itera
 //			The heaviest package should be returned first.
 //			Throw a NoSuchElementException if next() gets called even though there are no packages to return.
 			@Override
-			public E next() throws NoSuchElementException {
+			public Set<Package> next() throws NoSuchElementException {
 				this.countOfNext++;
-				E temp;
+				Set<Package>  temp;
 //				Object key = packagesByAddress.keySet().toArray()[index];
 
 				if (!hasNext()) {
@@ -71,7 +71,7 @@ public class Delivery<T extends String, E extends Set<Package>> implements Itera
 				} else {
 //					Sort by address, the set of packages sort by weight (the heaviest first)
 //					Map<String, Set<E>> sortedMap = Stream.of(packagesByAddress).collect(Comparator.comparing(Map::getKey)).collect(Comparator.comparing(Package::getWeight));
-					temp = (E) packagesByAddress.get(keyList.get(index));
+					temp = (Set<Package>) packagesByAddress.get(keyList.get(index));
 					index++;
 					return temp;
 				}
@@ -90,7 +90,7 @@ public class Delivery<T extends String, E extends Set<Package>> implements Itera
 				} else {
 //					A call to remove() starts the return process for the last package returned by getNext().
 					while(this.hasNext()) {
-						E package_set = this.next();
+						Set<Package> package_set = this.next();
 						for (Package package_ : package_set) {
 							String temp_sender = package_.getSender();
 							String temp_address = package_.getAddress();
