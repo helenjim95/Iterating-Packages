@@ -64,6 +64,7 @@ public class Delivery implements Iterable<Package> {
 				if (!hasNext()) {
 					throw new NoSuchElementException();
 				} else {
+					index++;
 //					Sort by address, the set of packages sort by weight (the heaviest first)
 					Map<String, Set<Package>> sortedMapByWeight = getPackagesByAddress().entrySet()
 							.stream()
@@ -97,26 +98,24 @@ public class Delivery implements Iterable<Package> {
 				} else {
 //					A call to remove() starts the return process for the last package returned by getNext().
 					while(this.hasNext()) {
-						Set<Package> package_set = (Set<Package>) this.next();
-						for (Package package_ : package_set) {
-							String temp_sender = package_.getSender();
-							String temp_address = package_.getAddress();
-							//					Swap the values of sender and address to indicate the return.
-							package_.setSender(temp_address);
-							package_.setAddress(temp_sender);
-							packagesByAddress.get(temp_address).remove(package_);
-		//					add this package to the suitable stack according to its new destination.
-							if (getPackagesByAddress().isEmpty()) {
-								getPackagesByAddress().put(package_.getAddress(), Set.of(package_));
+						Package package_ = this.next();
+						String temp_sender = package_.getSender();
+						String temp_address = package_.getAddress();
+						//					Swap the values of sender and address to indicate the return.
+						package_.setSender(temp_address);
+						package_.setAddress(temp_sender);
+						packagesByAddress.get(temp_address).remove(package_);
+	//					add this package to the suitable stack according to its new destination.
+						if (getPackagesByAddress().isEmpty()) {
+							getPackagesByAddress().put(package_.getAddress(), Set.of(package_));
+						} else {
+							if (getPackagesByAddress().containsKey(package_.getAddress())) {
+								Set<Package> newSet = new HashSet<>();
+								newSet.addAll(getPackagesByAddress().get(package_.getAddress()));
+								newSet.add(package_);
+								getPackagesByAddress().put(package_.getAddress(), newSet);
 							} else {
-								if (getPackagesByAddress().containsKey(package_.getAddress())) {
-									Set<Package> newSet = new HashSet<>();
-									newSet.addAll(getPackagesByAddress().get(package_.getAddress()));
-									newSet.add(package_);
-									getPackagesByAddress().put(package_.getAddress(), newSet);
-								} else {
-									getPackagesByAddress().put(package_.getAddress(), Set.of(package_));
-								}
+								getPackagesByAddress().put(package_.getAddress(), Set.of(package_));
 							}
 						}
 					}
