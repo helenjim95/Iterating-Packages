@@ -65,4 +65,5 @@ public class Package implements Comparable<Package> {
 	public int hashCode() {
 		return Objects.hash(sender, address, weight);
 	}
+
 }
