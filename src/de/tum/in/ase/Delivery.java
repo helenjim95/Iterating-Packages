@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 public class Delivery implements Iterable<Package> {
 
 	private final String address;
-	private Map<String, Set<Package>> packagesByAddress;
+	private final Map<String, Set<Package>> packagesByAddress;
 
 	public Delivery(String address, Map<String, Set<Package>> packages) {
 		this.address = address;
@@ -122,7 +122,7 @@ public class Delivery implements Iterable<Package> {
 								Set<Package> newSet = new HashSet<>();
 								newSet.addAll(getPackagesByAddress().get(package_.getSender()));
 								newSet.add(package_);
-								getPackagesByAddress().put(package_.getAddress(), newSet);
+								getPackagesByAddress().put(package_.getSender(), newSet);
 							}
 						}
 					}
