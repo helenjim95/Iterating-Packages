@@ -91,16 +91,13 @@ public class Delivery implements Iterable<Package> {
 			public void remove() throws NoSuchElementException {
 //				this.countOfRemoves++;
 //				Throw a NoSuchElementException in case next() was not called previously or if remove() gets called twice in a row.
-				if (this.index < 0) {
+				if (this.index <= 0) {
 					throw new NoSuchElementException();
 				} else {
 //					A call to remove() starts the return process for the last package returned by getNext().
-					if (this.index == 0) {
-						throw new IllegalStateException();
-					}
 					index--;
 
-					while(this.hasNext()) {
+					while (this.hasNext()) {
 						Package package_ = this.next();
 						String temp_sender = package_.getSender();
 						String temp_address = package_.getAddress();
