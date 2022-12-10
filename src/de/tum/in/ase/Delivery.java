@@ -3,7 +3,7 @@ package de.tum.in.ase;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Delivery implements Iterable<Package> {
+public class Delivery implements Iterable<Set<Package>> {
 
 	private final String address;
 	private final Map<String, Set<Package>> packagesByAddress;
@@ -48,16 +48,17 @@ public class Delivery implements Iterable<Package> {
 	}
 
 	@Override
-	public Iterator<Package> iterator() {
+	public Iterator<Set<Package>> iterator() {
 		return new Iterator<>() {
 			private int index = 0;
-//			private int countOfRemoves = 0;
+
+			//			private int countOfRemoves = 0;
 //			For any address, it returns all packages destinated to this address, sorted by their weight.
 //			The addresses are sorted in lexiographic order.
 //			The heaviest package should be returned first.
 //			Throw a NoSuchElementException if next() gets called even though there are no packages to return.
 			@Override
-			public Package next() throws NoSuchElementException {
+			public Set<Package> next() throws NoSuchElementException {
 				if (!hasNext()) {
 					throw new NoSuchElementException();
 				} else {
@@ -67,24 +68,23 @@ public class Delivery implements Iterable<Package> {
 							.stream()
 							.sorted(Map.Entry.comparingByKey())
 							.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
-							.sorted(Comparator.comparing(Package::getWeight).reversed())
+											.sorted(Comparator.comparing(Package::getWeight).reversed())
 							.collect(Collectors.toSet()),
 								(oldValue, newValue) -> oldValue, LinkedHashMap::new));
 					int count = 1;
 					for (Map.Entry<String, Set<Package>> entry :sortedMapByWeight.entrySet()) {
 						if (count == index) {
-							Set<Package> packageSet = entry.getValue();
-							return packageSet.toArray(new Package[0])[0];
+							return entry.getValue();
 						}
 						count++;
 					}
 				}
-				return null;
+				return Collections.emptySet();
 			}
 
 			@Override
 			public boolean hasNext() {
-				return index < getPackagesByAddress().size();
+				return this.index < getPackagesByAddress().size();
 			}
 
 			@Override
@@ -95,31 +95,33 @@ public class Delivery implements Iterable<Package> {
 					throw new NoSuchElementException();
 				} else {
 //					A call to remove() starts the return process for the last package returned by getNext().
-					index--;
+					this.index--;
 
 					while (this.hasNext()) {
-						Package package_ = this.next();
-						String temp_sender = package_.getSender();
-						String temp_address = package_.getAddress();
-						//					Swap the values of sender and address to indicate the return.
-						package_.setSender(temp_address);
-						package_.setAddress(temp_sender);
-//						getPackagesByAddress().get(temp_address).remove(package_);
-	//					add this package to the suitable stack according to its new destination.
-						if (getPackagesByAddress().isEmpty()) {
-							getPackagesByAddress().put(package_.getAddress(), Set.of(package_));
-						} else {
-							if (getPackagesByAddress().containsKey(package_.getAddress())) {
-								Set<Package> newSet = new HashSet<>();
-								newSet.addAll(getPackagesByAddress().get(package_.getAddress()));
-								newSet.add(package_);
-								getPackagesByAddress().put(package_.getAddress(), newSet);
-							}
-							if (getPackagesByAddress().containsKey(package_.getSender())) {
-								Set<Package> newSet = new HashSet<>();
-								newSet.addAll(getPackagesByAddress().get(package_.getSender()));
-								newSet.add(package_);
-								getPackagesByAddress().put(package_.getSender(), newSet);
+						Set<Package> package_set = this.next();
+						for (Package package_ : package_set) {
+							String temp_sender = package_.getSender();
+							String temp_address = package_.getAddress();
+							//					Swap the values of sender and address to indicate the return.
+							package_.setSender(temp_address);
+							package_.setAddress(temp_sender);
+							//						getPackagesByAddress().get(temp_address).remove(package_);
+							//					add this package to the suitable stack according to its new destination.
+							if (getPackagesByAddress().isEmpty()) {
+								getPackagesByAddress().put(package_.getAddress(), Set.of(package_));
+							} else {
+								if (getPackagesByAddress().containsKey(package_.getAddress())) {
+									Set<Package> newSet = new HashSet<>();
+									newSet.addAll(getPackagesByAddress().get(package_.getAddress()));
+									newSet.add(package_);
+									getPackagesByAddress().put(package_.getAddress(), newSet);
+								}
+								if (getPackagesByAddress().containsKey(package_.getSender())) {
+									Set<Package> newSet = new HashSet<>();
+									newSet.addAll(getPackagesByAddress().get(package_.getSender()));
+									newSet.add(package_);
+									getPackagesByAddress().put(package_.getSender(), newSet);
+								}
 							}
 						}
 					}
