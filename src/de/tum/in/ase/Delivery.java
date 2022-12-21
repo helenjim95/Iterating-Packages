@@ -96,9 +96,8 @@ public class Delivery implements Iterable<Package> {
 
 			@Override
 			public void remove() throws NoSuchElementException {
-//				this.countOfRemoves++;
 //				Throw a NoSuchElementException in case next() was not called previously or if remove() gets called twice in a row.
-				if (this.index < 0) {
+				if (this.index < 1) {
 					throw new NoSuchElementException();
 				} else {
 //					A call to remove() starts the return process for the last package returned by getNext().
