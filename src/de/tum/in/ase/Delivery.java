@@ -67,12 +67,10 @@ public class Delivery implements Iterable<Package> {
 							.stream()
 							.sorted(Map.Entry.comparingByKey())
 							.collect(Collectors.toMap(Map.Entry::getKey, 
-									e -> e.getValue().stream()
-									.collect(Collectors.toSet()), (e1, e2) -> e1, LinkedHashMap::new));
+									e -> new HashSet<>(e.getValue()), (e1, e2) -> e1, LinkedHashMap::new));
 							sortedMap.entrySet()
-							.stream()
 							.forEach(entry -> {
-								List<Package> sortedList = entry.getValue().stream().collect(Collectors.toList());
+								List<Package> sortedList = new ArrayList<>(entry.getValue());
 								sortedList.sort(Package::compareTo);
 								Set<Package> sortedSet = new HashSet<>(sortedList);
 								entry.setValue(sortedSet);
@@ -148,8 +146,9 @@ public class Delivery implements Iterable<Package> {
 		delivery.add(new Package("Antarcticplace 123", "Penguroad 1", 6));
 		Iterator iterator = delivery.iterator();
 //		System.out.println(iterator.hasNext());
-//		System.out.println(iterator.next());
-		iterator.remove();
+		System.out.println(iterator.next());
+		System.out.println(iterator.next());
+//		iterator.remove();
 		System.out.println(delivery.packagesByAddress);
 	}
 }
