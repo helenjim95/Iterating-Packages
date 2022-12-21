@@ -51,7 +51,7 @@ public class Delivery implements Iterable<Package> {
 	public Iterator<Package> iterator() {
 		return new Iterator<>() {
 			private int index = 0;
-//			private int countOfRemoves = 0;
+			private int countOfRemoves = 0;
 //			For any address, it returns all packages destinated to this address, sorted by their weight.
 //			The addresses are sorted in lexiographic order.
 //			The heaviest package should be returned first.
@@ -96,8 +96,9 @@ public class Delivery implements Iterable<Package> {
 
 			@Override
 			public void remove() throws NoSuchElementException {
+				countOfRemoves++;
 //				Throw a NoSuchElementException in case next() was not called previously or if remove() gets called twice in a row.
-				if (this.index < 2) {
+				if (this.index < 0) {
 					throw new NoSuchElementException();
 				} else {
 //					A call to remove() starts the return process for the last package returned by getNext().
