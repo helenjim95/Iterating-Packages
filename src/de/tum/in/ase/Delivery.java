@@ -61,7 +61,7 @@ public class Delivery implements Iterable<Package> {
 				if (!hasNext()) {
 					throw new NoSuchElementException();
 				} else {
-					index++;
+					this.index++;
 //					Sort by address, the set of packages sort by weight (the heaviest first)
 					Map<String, Set<Package>> sortedMap = getPackagesByAddress().entrySet()
 							.stream()
@@ -79,7 +79,7 @@ public class Delivery implements Iterable<Package> {
 							}); 
 					int count = 1;
 					for (Map.Entry<String, Set<Package>> entry :sortedMap.entrySet()) {
-						if (count == index) {
+						if (count == this.index) {
 							Set<Package> packageSet = entry.getValue();
 							return packageSet.toArray(new Package[0])[0];
 						}
@@ -96,7 +96,7 @@ public class Delivery implements Iterable<Package> {
 
 			@Override
 			public void remove() throws NoSuchElementException {
-				countOfRemoves++;
+				this.countOfRemoves++;
 //				Throw a NoSuchElementException in case next() was not called previously or if remove() gets called twice in a row.
 				if (this.index < 0) {
 					throw new NoSuchElementException();
